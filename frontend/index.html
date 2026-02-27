@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Success Prediction System</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="loginPage" class="page active">
+        <div class="login-container">
+            <div class="login-header">
+                <h1>Student Success Prediction System</h1>
+                <p>Empowering Education Through Data Analytics</p>
+            </div>
+            
+            <div class="login-tabs">
+                <button class="tab-btn active" onclick="switchTab('student')">Student Login</button>
+                <button class="tab-btn" onclick="switchTab('teacher')">Teacher Login</button>
+            </div>
+            
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="btn-primary">Login</button>
+                <div id="loginError" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Teacher Dashboard -->
+    <div id="teacherDashboard" class="page">
+        <nav class="navbar">
+            <h2>Teacher Dashboard</h2>
+            <div class="nav-right">
+                <span id="teacherName"></span>
+                <button onclick="logout()" class="btn-secondary">Logout</button>
+            </div>
+        </nav>
+        
+        <div class="dashboard-container">
+            <div class="section-tabs">
+                <button class="section-tab active" onclick="showSection('enterMarks')">Enter Marks</button>
+                <button class="section-tab" onclick="showSection('viewMarks')">View/Delete Marks</button>
+                <button class="section-tab" onclick="showSection('viewPerformance')">Student Performance</button>
+                <button class="section-tab" onclick="showSection('analytics')">Analytics</button>
+            </div>
+            
+            <!-- Enter Marks Section -->
+            <div id="enterMarks" class="section active">
+                <div class="card">
+                    <h3>Enter Student Marks</h3>
+                    <form id="marksForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Select Student</label>
+                                <select id="studentSelect" required></select>
+                            </div>
+                            <div class="form-group">
+                                <label>Semester (1-8)</label>
+                                <input type="number" id="semester" min="1" max="8" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Subject Name</label>
+                                <input type="text" id="subjectName" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Credits</label>
+                                <input type="number" id="credits" value="3" min="1" max="6" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Internal Marks (Max 30)</label>
+                                <input type="number" id="internalMarks" min="0" max="30" step="0.01" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Practical Marks (Max 20)</label>
+                                <input type="number" id="practicalMarks" min="0" max="20" step="0.01" required>
+                            </div>
+                            <div class="form-group">
+                                <label>External Marks (Max 50)</label>
+                                <input type="number" id="externalMarks" min="0" max="50" step="0.01" required>
+                            </div>
+                        </div>
+                        <div class="result-preview">
+                            <div class="result-item">
+                                <span>Total Marks:</span>
+                                <strong id="totalMarks">0</strong>
+                            </div>
+                            <div class="result-item">
+                                <span>Status:</span>
+                                <strong id="status">-</strong>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-primary">Submit Marks</button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- View/Delete Marks Section -->
+            <div id="viewMarks" class="section">
+                <div class="card">
+                    <h3>View and Delete Marks</h3>
+                    <div class="form-group" style="max-width: 400px;">
+                        <label>Select Student</label>
+                        <select id="viewStudentSelect" onchange="loadStudentMarks()">
+                            <option value="">Select Student</option>
+                        </select>
+                    </div>
+                    <div id="studentMarksTable"></div>
+                </div>
+            </div>
+            
+            <!-- View Performance Section -->
+            <div id="viewPerformance" class="section">
+                <div class="card">
+                    <h3>Student Performance Overview</h3>
+                    <div class="performance-categories">
+                        <div class="category-card excellent">
+                            <h4>Excellent (CGPA ≥ 9.0)</h4>
+                            <div id="excellentStudents" class="student-list"></div>
+                        </div>
+                        <div class="category-card good">
+                            <h4>Good (CGPA 8.0-8.9)</h4>
+                            <div id="goodStudents" class="student-list"></div>
+                        </div>
+                        <div class="category-card average">
+                            <h4>Average (CGPA 6.5-7.9)</h4>
+                            <div id="averageStudents" class="student-list"></div>
+                        </div>
+                        <div class="category-card below-average">
+                            <h4>Below Average (CGPA 5.0-6.4)</h4>
+                            <div id="belowAverageStudents" class="student-list"></div>
+                        </div>
+                        <div class="category-card poor">
+                            <h4>Poor (CGPA < 5.0)</h4>
+                            <div id="poorStudents" class="student-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Analytics Section -->
+            <div id="analytics" class="section">
+                <div class="card">
+                    <h3>Performance Analytics</h3>
+                    <canvas id="performanceChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Dashboard -->
+    <div id="studentDashboard" class="page">
+        <nav class="navbar">
+            <h2>Student Dashboard</h2>
+            <div class="nav-right">
+                <span id="studentName"></span>
+                <button onclick="logout()" class="btn-secondary">Logout</button>
+            </div>
+        </nav>
+        
+        <div class="dashboard-container">
+            <div class="section-tabs">
+                <button class="section-tab active" onclick="showStudentSection('myMarks')">My Marks</button>
+                <button class="section-tab" onclick="showStudentSection('cgpaPredictor')">CGPA Predictor</button>
+                <button class="section-tab" onclick="showStudentSection('myProgress')">My Progress</button>
+            </div>
+            
+            <!-- My Marks Section -->
+            <div id="myMarks" class="section active">
+                <div class="card">
+                    <h3>My Academic Performance</h3>
+                    <div id="marksTable"></div>
+                </div>
+            </div>
+            
+            <!-- CGPA Predictor Section -->
+            <div id="cgpaPredictor" class="section">
+                <div class="card">
+                    <h3>Target CGPA Calculator</h3>
+                    <div class="predictor-form">
+                        <div class="form-group">
+                            <label>Current Semester</label>
+                            <input type="number" id="currentSem" min="1" max="8" value="1">
+                        </div>
+                        <div class="form-group">
+                            <label>Target CGPA</label>
+                            <input type="number" id="targetCGPA" min="0" max="10" step="0.01" value="8.0">
+                        </div>
+                        <button onclick="predictSGPA()" class="btn-primary">Calculate Required SGPA</button>
+                    </div>
+                    <div id="predictionResult" class="prediction-result"></div>
+                </div>
+            </div>
+            
+            <!-- My Progress Section -->
+            <div id="myProgress" class="section">
+                <div class="card">
+                    <h3>Semester-wise Performance</h3>
+                    <canvas id="studentProgressChart"></canvas>
+                </div>
+                <div class="card">
+                    <h3>Performance Summary</h3>
+                    <div id="performanceSummary"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

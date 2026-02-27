@@ -1,0 +1,129 @@
+========================================
+MANUAL DATABASE SETUP INSTRUCTIONS
+========================================
+
+STEP 1: Open MySQL Workbench or MySQL Command Line
+---------------------------------------------------
+Option A: MySQL Workbench
+- Open MySQL Workbench application
+- Click on your local connection
+- Enter password: kamali_kasthuri
+
+Option B: MySQL Command Line
+- Search "MySQL Command Line Client" in Windows Start
+- Open it
+- Enter password: kamali_kasthuri
+
+
+STEP 2: Copy and Paste This SQL Code
+-------------------------------------
+Copy ALL the code below and paste it into MySQL:
+
+-- Create Database
+CREATE DATABASE IF NOT EXISTS student_success_system;
+USE student_success_system;
+
+-- Create Tables
+CREATE TABLE users (
+    user_id INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    user_type ENUM('teacher', 'student') NOT NULL,
+    full_name VARCHAR(100) NOT NULL,
+    email VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE students (
+    student_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT UNIQUE,
+    roll_number VARCHAR(20) UNIQUE NOT NULL,
+    department VARCHAR(50),
+    current_semester INT DEFAULT 1,
+    target_cgpa DECIMAL(3,2),
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+CREATE TABLE marks (
+    mark_id INT PRIMARY KEY AUTO_INCREMENT,
+    student_id INT,
+    semester INT NOT NULL,
+    subject_name VARCHAR(100) NOT NULL,
+    internal_marks DECIMAL(5,2),
+    practical_marks DECIMAL(5,2),
+    external_marks DECIMAL(5,2),
+    total_marks DECIMAL(5,2),
+    grade VARCHAR(2),
+    status ENUM('Pass', 'Fail'),
+    credits INT DEFAULT 3,
+    entered_by INT,
+    entry_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE,
+    FOREIGN KEY (entered_by) REFERENCES users(user_id)
+);
+
+CREATE TABLE semester_performance (
+    performance_id INT PRIMARY KEY AUTO_INCREMENT,
+    student_id INT,
+    semester INT NOT NULL,
+    sgpa DECIMAL(3,2),
+    cgpa DECIMAL(3,2),
+    total_credits INT,
+    performance_category ENUM('Excellent', 'Good', 'Average', 'Below Average', 'Poor'),
+    calculated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE,
+    UNIQUE KEY unique_student_semester (student_id, semester)
+);
+
+-- Insert Teacher Account
+INSERT INTO users (username, password, user_type, full_name, email) 
+VALUES ('teacher1', 'teacher123', 'teacher', 'Dr. John Smith', 'teacher@college.edu');
+
+-- Insert Student Accounts
+INSERT INTO users (username, password, user_type, full_name, email) 
+VALUES 
+('student1', 'student123', 'student', 'Kamali', 'kamali@student.edu'),
+('student2', 'student123', 'student', 'Kabi', 'kabi@student.edu'),
+('student3', 'student123', 'student', 'Vaishu', 'vaishu@student.edu'),
+('student4', 'student123', 'student', 'Deepika', 'deepika@student.edu'),
+('student5', 'student123', 'student', 'Vijay', 'vijay@student.edu'),
+('student6', 'student123', 'student', 'Ashu', 'ashu@student.edu');
+
+INSERT INTO students (user_id, roll_number, department, current_semester, target_cgpa)
+VALUES 
+(2, 'CS2021001', 'Computer Science', 3, 8.0),
+(3, 'CS2021002', 'Computer Science', 3, 7.5),
+(4, 'CS2021003', 'Computer Science', 3, 7.9),
+(5, 'CS2021004', 'Computer Science', 3, 7.6),
+(6, 'CS2021005', 'Computer Science', 3, 7.0),
+(7, 'CS2021006', 'Computer Science', 3, 7.7);
+
+
+STEP 3: Execute the Code
+-------------------------
+- Click "Execute" button (lightning bolt icon) in MySQL Workbench
+  OR
+- Press Enter after pasting in MySQL Command Line
+
+
+STEP 4: Verify Success
+-----------------------
+You should see messages like:
+✓ Database created
+✓ Tables created
+✓ 1 row inserted (teacher)
+✓ 6 rows inserted (students)
+
+
+STEP 5: Start the Application
+------------------------------
+1. Run START_SERVER.bat (keep it open)
+2. Open frontend/index.html in browser
+3. Login with:
+   Teacher: teacher1 / teacher123
+   Student: student1 / student123
+
+
+========================================
+DONE! Your database is ready!
+========================================
