@@ -405,13 +405,41 @@ function predictSGPA() {
     const currentSem = parseInt(document.getElementById('currentSem').value);
     const targetCGPA = parseFloat(document.getElementById('targetCGPA').value);
     
-    if (currentSem < 1 || currentSem > 8 || targetCGPA < 0 || targetCGPA > 10) {
-        alert('Invalid input');
+    // Validation
+    if (currentSem < 1 || currentSem > 8) {
+        alert('Current semester must be between 1 and 8');
         return;
     }
     
-    const marks = JSON.parse(localStorage.getItem('marks')).filter(m => m.studentId === currentUser.id && m.semester < currentSem);
+    if (targetCGPA < 0 || targetCGPA > 10) {
+        alert('Target CGPA must be between 0 and 10');
+        return;
+    }
     
+    // Get marks for completed semesters only
+    const marks = JSON.parse(localStorage.getItem('marks')).filter(m => m.studentId === currentUser.id);
+    
+    if (marks.length === 0) {
+        alert('No marks found. Please complete at least one semester first.');
+        return;
+    }
+    
+    // Find highest semester with marks
+    const completedSemesters = [...new Set(marks.map(m => m.semester))].sort((a, b) => b - a);
+    const highestCompletedSem = completedSemesters[0];
+    
+    // Validate current semester
+    if (currentSem <= highestCompletedSem) {
+        alert(`Invalid! You have already completed semester ${highestCompletedSem}. Current semester must be ${highestCompletedSem + 1} or higher.`);
+        return;
+    }
+    
+    if (currentSem > 8) {
+        alert('Current semester cannot exceed 8');
+        return;
+    }
+    
+    // Calculate current CGPA from completed semesters
     let totalCredits = 0, totalGradePoints = 0;
     marks.forEach(m => {
         const gp = { O: 10, 'A+': 9, A: 8, 'B+': 7, B: 6, F: 0 }[m.grade] || 0;
@@ -419,21 +447,34 @@ function predictSGPA() {
         totalGradePoints += gp * m.credits;
     });
     
-    const currentCGPA = totalCredits > 0 ? (totalGradePoints / totalCredits).toFixed(2) : '0.00';
+    const currentCGPA = totalCredits > 0 ? (totalGradePoints / totalCredits) : 0;
+    
+    // Check if current CGPA already exceeds target
+    if (currentCGPA >= targetCGPA) {
+        document.getElementById('predictionResult').innerHTML = `
+            <div class="prediction-card"><h4>Current CGPA</h4><div class="value">${currentCGPA.toFixed(2)}</div></div>
+            <div class="prediction-card"><h4>Target CGPA</h4><div class="value">${targetCGPA.toFixed(2)}</div></div>
+            <div class="prediction-card"><h4>Status</h4><div class="value achievable">✓ Already Achieved!</div></div>
+            <p style="color: #10b981; margin-top: 15px; text-align: center; font-weight: 600;">Congratulations! Your current CGPA (${currentCGPA.toFixed(2)}) is already ${currentCGPA > targetCGPA ? 'higher than' : 'equal to'} your target CGPA (${targetCGPA.toFixed(2)}).</p>
+        `;
+        return;
+    }
+    
+    // Calculate required SGPA
     const remainingSemesters = 8 - currentSem + 1;
     const creditsPerSem = 20;
     const totalFutureCredits = remainingSemesters * creditsPerSem;
     const requiredFutureGP = targetCGPA * (totalCredits + totalFutureCredits) - totalGradePoints;
-    const requiredSGPA = (requiredFutureGP / totalFutureCredits).toFixed(2);
+    const requiredSGPA = (requiredFutureGP / totalFutureCredits);
     const achievable = requiredSGPA <= 10 && requiredSGPA >= 0;
     
     document.getElementById('predictionResult').innerHTML = `
-        <div class="prediction-card"><h4>Current CGPA</h4><div class="value">${currentCGPA}</div></div>
+        <div class="prediction-card"><h4>Current CGPA</h4><div class="value">${currentCGPA.toFixed(2)}</div></div>
         <div class="prediction-card"><h4>Target CGPA</h4><div class="value">${targetCGPA.toFixed(2)}</div></div>
-        <div class="prediction-card"><h4>Required SGPA</h4><div class="value">${requiredSGPA}</div></div>
+        <div class="prediction-card"><h4>Required SGPA</h4><div class="value">${requiredSGPA.toFixed(2)}</div></div>
         <div class="prediction-card"><h4>Remaining Semesters</h4><div class="value">${remainingSemesters}</div></div>
         <div class="prediction-card"><h4>Status</h4><div class="value ${achievable ? 'achievable' : 'not-achievable'}">${achievable ? '✓ Achievable' : '✗ Not Achievable'}</div></div>
-        ${!achievable ? '<p style="color: #ef4444; margin-top: 15px;">Required SGPA exceeds 10.0. Adjust your target.</p>' : ''}
+        ${!achievable ? '<p style="color: #ef4444; margin-top: 15px; text-align: center; font-weight: 600;">Required SGPA exceeds 10.0. Please lower your target CGPA.</p>' : '<p style="color: #10b981; margin-top: 15px; text-align: center; font-weight: 600;">You need to score an average SGPA of ' + requiredSGPA.toFixed(2) + ' in remaining semesters!</p>'}
     `;
 }
 
