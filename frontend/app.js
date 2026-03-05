@@ -424,24 +424,17 @@ function predictSGPA() {
         return;
     }
     
-    // Find highest completed semester
-    const completedSemesters = [...new Set(marks.map(m => m.semester))].sort((a, b) => b - a);
-    const highestCompletedSem = completedSemesters[0];
-    const expectedCurrentSem = highestCompletedSem + 1;
+    // Find the LOWEST semester with marks (this is the current semester)
+    const semestersWithMarks = [...new Set(marks.map(m => m.semester))].sort((a, b) => a - b);
+    const lowestSemWithMarks = semestersWithMarks[0];
     
-    // Current semester must be exactly one more than highest completed
-    if (currentSem !== expectedCurrentSem) {
-        alert(`Error! You have completed semester ${highestCompletedSem}. Current semester must be ${expectedCurrentSem}.`);
+    // Current semester must match the lowest semester with marks
+    if (currentSem !== lowestSemWithMarks) {
+        alert(`Error! You have marks entered for semester ${lowestSemWithMarks}. Current semester must be ${lowestSemWithMarks}.`);
         return;
     }
     
-    // Check if already at semester 8
-    if (highestCompletedSem === 8) {
-        alert('You have already completed all 8 semesters!');
-        return;
-    }
-    
-    // Calculate current CGPA from completed semesters
+    // Calculate current CGPA from all marks
     let totalCredits = 0, totalGradePoints = 0;
     marks.forEach(m => {
         const gp = { O: 10, 'A+': 9, A: 8, 'B+': 7, B: 6, F: 0 }[m.grade] || 0;
@@ -462,8 +455,17 @@ function predictSGPA() {
         return;
     }
     
-    // Calculate required SGPA
-    const remainingSemesters = 8 - currentSem + 1;
+    // Find highest semester with marks
+    const highestSemWithMarks = semestersWithMarks[semestersWithMarks.length - 1];
+    
+    // Check if all semesters completed
+    if (highestSemWithMarks === 8) {
+        alert('You have already completed all 8 semesters!');
+        return;
+    }
+    
+    // Calculate required SGPA for remaining semesters
+    const remainingSemesters = 8 - highestSemWithMarks;
     const creditsPerSem = 20;
     const totalFutureCredits = remainingSemesters * creditsPerSem;
     const requiredFutureGP = targetCGPA * (totalCredits + totalFutureCredits) - totalGradePoints;
