@@ -41,6 +41,33 @@ body {
     position: relative;
     margin: 0;
     padding: 0;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+body.dark-mode {
+    --surface: #1E293B;
+    --surface-dark: #0F172A;
+    --text-primary: #F1F5F9;
+    --text-secondary: #94A3B8;
+    --border: #334155;
+    --border-light: #1E293B;
+}
+
+body.dark-mode .page {
+    background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+}
+
+body.dark-mode .card {
+    background: #1E293B;
+    border-color: #334155;
+}
+
+body.dark-mode table td {
+    color: #F1F5F9;
+}
+
+body.dark-mode .category-card::before {
+    background: rgba(0, 0, 0, 0.3);
 }
 
 body::before {
@@ -64,7 +91,7 @@ body::before {
     width: 100%;
     height: 100%;
     overflow-y: auto;
-    background: linear-gradient(135deg, #064E3B 0%, #0C4A6E 50%, #1E3A8A 100%);
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     z-index: 1;
 }
 
@@ -86,6 +113,44 @@ body::before {
     justify-content: center;
     padding: 20px;
     z-index: 1;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.floating-emojis {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.emoji {
+    position: absolute;
+    font-size: 40px;
+    opacity: 0.3;
+    animation: floatUp 15s infinite ease-in-out;
+    bottom: -100px;
+}
+
+@keyframes floatUp {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.3;
+    }
+    90% {
+        opacity: 0.3;
+    }
+    100% {
+        transform: translateY(-100vh) rotate(360deg);
+        opacity: 0;
+    }
 }
 
 #loginPage.active {
@@ -101,6 +166,7 @@ body::before {
     overflow: hidden;
     animation: slideUp 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
     position: relative;
+    z-index: 10;
 }
 
 .login-container::before {
@@ -123,12 +189,23 @@ body::before {
 }
 
 .login-header {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-    padding: 60px 50px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 50px 50px 60px;
     text-align: center;
     position: relative;
     overflow: hidden;
     clip-path: polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%);
+}
+
+.logo {
+    font-size: 64px;
+    margin-bottom: 15px;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
 }
 
 .login-header::before {
@@ -148,11 +225,11 @@ body::before {
 }
 
 .login-header h1 {
-    font-size: 36px;
+    font-size: 32px;
     font-weight: 900;
     color: var(--text-white);
-    margin-bottom: 18px;
-    letter-spacing: -1px;
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
     position: relative;
     z-index: 1;
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
@@ -179,7 +256,7 @@ body::before {
     border: none;
     background: transparent;
     cursor: pointer;
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 700;
     color: var(--text-secondary);
     border-radius: 16px;
@@ -187,6 +264,14 @@ body::before {
     font-family: 'Poppins', sans-serif;
     position: relative;
     overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.tab-icon {
+    font-size: 20px;
 }
 
 .tab-btn::before {
@@ -197,7 +282,7 @@ body::before {
     width: 0;
     height: 0;
     border-radius: 50%;
-    background: rgba(5, 150, 105, 0.1);
+    background: rgba(102, 126, 234, 0.1);
     transform: translate(-50%, -50%);
     transition: width 0.6s, height 0.6s;
 }
@@ -208,19 +293,32 @@ body::before {
 }
 
 .tab-btn:hover {
-    color: var(--primary);
+    color: #667eea;
     transform: translateY(-2px);
 }
 
 .tab-btn.active {
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    background: linear-gradient(135deg, #667eea, #764ba2);
     color: var(--text-white);
-    box-shadow: 0 8px 20px rgba(5, 150, 105, 0.4);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
     transform: scale(1.02);
 }
 
 .login-form {
     padding: 50px;
+}
+
+.login-footer {
+    padding: 20px 50px 30px;
+    text-align: center;
+    background: var(--surface-dark);
+    border-top: 1px solid var(--border-light);
+}
+
+.login-footer p {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 0;
 }
 
 .form-group {
@@ -261,7 +359,7 @@ body::before {
 .btn-primary {
     width: 100%;
     padding: 20px 32px;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: var(--text-white);
     border: none;
     border-radius: 14px;
@@ -269,7 +367,7 @@ body::before {
     font-weight: 800;
     cursor: pointer;
     transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    box-shadow: 0 8px 20px rgba(5, 150, 105, 0.4);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
     letter-spacing: 0.5px;
     font-family: 'Poppins', sans-serif;
     position: relative;
@@ -296,7 +394,7 @@ body::before {
 
 .btn-primary:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 30px rgba(5, 150, 105, 0.5);
+    box-shadow: 0 12px 30px rgba(102, 126, 234, 0.5);
 }
 
 .btn-primary:active {
@@ -321,6 +419,41 @@ body::before {
     color: var(--text-white);
     transform: translateY(-3px);
     box-shadow: 0 8px 20px rgba(5, 150, 105, 0.3);
+}
+
+.btn-icon {
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--text-white);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.btn-icon:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1) rotate(15deg);
+}
+
+.btn-export {
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: var(--text-white);
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Poppins', sans-serif;
+}
+
+.btn-export:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
 }
 
 .btn-delete {
@@ -373,13 +506,13 @@ body::before {
 /* ==================== NAVBAR ==================== */
 
 .navbar {
-    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: var(--text-white);
     padding: 30px 60px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
     position: sticky;
     top: 0;
     z-index: 100;
@@ -437,15 +570,15 @@ body::before {
 }
 
 .section-tab:hover {
-    color: var(--primary);
-    background: rgba(5, 150, 105, 0.1);
+    color: #667eea;
+    background: rgba(102, 126, 234, 0.1);
     transform: translateY(-2px);
 }
 
 .section-tab.active {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: var(--text-white);
-    box-shadow: 0 8px 20px rgba(5, 150, 105, 0.4);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
 }
 
 .section {
@@ -474,7 +607,7 @@ body::before {
 
 .card h3 {
     margin-bottom: 40px;
-    color: var(--primary);
+    color: #667eea;
     font-size: 28px;
     font-weight: 800;
     letter-spacing: -0.8px;
@@ -490,14 +623,14 @@ body::before {
 }
 
 .result-preview {
-    background: linear-gradient(135deg, rgba(5, 150, 105, 0.1) 0%, rgba(8, 145, 178, 0.1) 100%);
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
     padding: 36px;
     border-radius: 18px;
     margin: 35px 0;
     display: flex;
     justify-content: space-around;
     gap: 28px;
-    border: 3px solid rgba(5, 150, 105, 0.2);
+    border: 3px solid rgba(102, 126, 234, 0.2);
 }
 
 .result-item {
@@ -518,7 +651,7 @@ body::before {
 .result-item strong {
     font-size: 40px;
     font-weight: 900;
-    color: var(--primary);
+    color: #667eea;
     letter-spacing: -1.5px;
 }
 
@@ -621,7 +754,7 @@ table {
 }
 
 table th {
-    background: linear-gradient(135deg, #059669 0%, #0891B2 100%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: var(--text-white);
     padding: 20px 26px;
     text-align: left;
@@ -681,7 +814,7 @@ table tbody tr:last-child td {
     margin-bottom: 22px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
-    border-left: 6px solid var(--primary);
+    border-left: 6px solid #667eea;
 }
 
 .prediction-card:hover {
@@ -701,7 +834,7 @@ table tbody tr:last-child td {
 .prediction-card .value {
     font-size: 44px;
     font-weight: 900;
-    color: var(--primary);
+    color: #667eea;
     letter-spacing: -2px;
 }
 
@@ -724,12 +857,12 @@ table tbody tr:last-child td {
 }
 
 .summary-card {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: var(--text-white);
     padding: 40px;
     border-radius: 18px;
     text-align: center;
-    box-shadow: 0 10px 30px rgba(5, 150, 105, 0.3);
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
@@ -747,7 +880,7 @@ table tbody tr:last-child td {
 
 .summary-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 15px 40px rgba(5, 150, 105, 0.4);
+    box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
 }
 
 .summary-card h4 {
@@ -767,6 +900,68 @@ table tbody tr:last-child td {
     letter-spacing: -2px;
     position: relative;
     z-index: 1;
+}
+
+/* ==================== INSIGHTS ==================== */
+
+.insights-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.insight-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 14px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.insight-card h4 {
+    font-size: 13px;
+    opacity: 0.9;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.insight-card .value {
+    font-size: 32px;
+    font-weight: 900;
+}
+
+.trend-up { color: #10b981; }
+.trend-down { color: #ef4444; }
+
+/* ==================== ATTENDANCE ==================== */
+
+.attendance-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.attendance-stat {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 24px;
+    border-radius: 14px;
+    text-align: center;
+}
+
+.attendance-stat h4 {
+    font-size: 13px;
+    opacity: 0.9;
+    margin-bottom: 8px;
+}
+
+.attendance-stat .value {
+    font-size: 36px;
+    font-weight: 900;
 }
 
 /* ==================== RESPONSIVE ==================== */

@@ -7,86 +7,56 @@ A comprehensive web-based system for tracking and predicting student academic pe
 ### Teacher Portal
 - **Secure Login System**: Dedicated teacher authentication
 - **Marks Entry**: Enter internal, practical, and external marks for students
+- **Attendance Tracking**: Mark and monitor student attendance with statistics
 - **Automatic Grading**: System automatically calculates total marks, grades, and pass/fail status
-- **Performance Analytics**: Visual graphs showing student performance trends
+- **Performance Analytics**: Visual graphs showing student performance trends with insights
 - **Student Segregation**: Automatically categorizes students based on CGPA:
   - Excellent (≥9.0)
   - Good (8.0-8.9)
   - Average (6.5-7.9)
   - Below Average (5.0-6.4)
   - Poor (<5.0)
+- **Search & Filter**: Quick search functionality to find students
+- **PDF Export**: Export performance reports and analytics charts
+- **Dark Mode**: Professional dark theme toggle
 
 ### Student Portal
 - **Secure Login System**: Dedicated student authentication
 - **View Marks**: Access internal, practical, and external marks for all semesters
+- **Attendance View**: Check attendance records and percentage
 - **CGPA Predictor**: Calculate required SGPA to achieve target CGPA
 - **Performance Tracking**: Visual graphs showing semester-wise progress
 - **Target Setting**: Set and track target CGPA goals
+- **PDF Export**: Download marks and progress reports
+- **Dark Mode**: Professional dark theme toggle
 - **8 Semester Support**: Complete support for all 8 semesters
 
 ## Technology Stack
 
 ### Frontend
 - HTML5
-- CSS3 (Modern gradient design with professional color scheme)
+- CSS3 (Modern gradient design with professional purple color scheme)
 - JavaScript (ES6+)
 - Chart.js (for data visualization)
-
-### Backend
-- Node.js
-- Express.js
-- RESTful API architecture
-
-### Database
-- MySQL
-- Structured relational database design
+- jsPDF (for PDF export)
+- html2canvas (for chart export)
+- LocalStorage (for data persistence)
 
 ## Installation & Setup
 
 ### Prerequisites
-- Node.js (v14 or higher)
-- MySQL Server
-- npm (Node Package Manager)
+- Modern web browser (Chrome, Firefox, Edge, Safari)
+- No backend or database required!
 
-### Step 1: Database Setup
+### Quick Start
 
-1. Open MySQL Command Line or MySQL Workbench
-2. Login with your credentials (password: kamali_kasthuri)
-3. Run the database schema:
-
-```bash
-mysql -u root -p < database/schema.sql
-```
-
-Or manually execute the SQL file in MySQL Workbench.
-
-### Step 2: Backend Setup
-
-1. Navigate to backend directory:
-```bash
-cd backend
-```
-
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. Start the server:
-```bash
-npm start
-```
-
-The backend server will run on `http://localhost:5000`
-
-### Step 3: Frontend Setup
-
-1. Navigate to frontend directory:
+1. Clone or download the repository
+2. Navigate to the frontend directory:
 ```bash
 cd frontend
 ```
 
-2. Open `index.html` in a web browser, or use a local server:
+3. Open `index.html` in a web browser, or use a local server:
 ```bash
 # Using Python
 python -m http.server 8000
@@ -95,7 +65,9 @@ python -m http.server 8000
 npx http-server -p 8000
 ```
 
-3. Access the application at `http://localhost:8000`
+4. Access the application at `http://localhost:8000` or directly open `index.html`
+
+5. All data is stored in browser's LocalStorage - no database setup needed!
 
 ## Default Login Credentials
 
@@ -104,9 +76,39 @@ npx http-server -p 8000
 - Password: `teacher123`
 
 ### Student Accounts
-- Username: `student1` | Password: `student123`
-- Username: `student2` | Password: `student123`
-- Username: `student3` | Password: `student123`
+- Username: `student1-8` | Password: `student123`
+- Example: student1/student123, student2/student123, etc.
+
+## Key Features Explained
+
+### 🌙 Dark Mode
+- Toggle between light and dark themes
+- Preference saved in browser
+- Easy on the eyes for night-time use
+
+### 📊 Attendance Tracking
+- Mark daily attendance (Present/Absent/Late)
+- View attendance statistics and percentage
+- Date-wise attendance records
+- Students can view their own attendance
+
+### 🔍 Search & Filter
+- Quick search for students in performance view
+- Real-time filtering
+- Highlights matching results
+
+### 📄 PDF Export
+- Export performance reports
+- Download analytics charts
+- Save student marks and progress
+- Professional PDF formatting
+
+### 📈 Enhanced Analytics
+- Total students count
+- Average CGPA calculation
+- Top CGPA display
+- Pass rate percentage
+- Visual trend analysis
 
 ## Database Schema
 
@@ -185,24 +187,30 @@ The application uses a modern, professional color palette:
 ```
 s6/
 ├── frontend/
-│   ├── index.html
-│   ├── styles.css
-│   └── script.js
-├── backend/
+│   ├── index.html      # Main HTML with all pages
+│   ├── styles.css      # Professional purple theme with dark mode
+│   └── app.js          # Complete application logic with LocalStorage
+├── backend/            # (Optional - not required for current version)
 │   ├── server.js
 │   └── package.json
-└── database/
+└── database/           # (Optional - not required for current version)
     └── schema.sql
 ```
 
 ## Future Enhancements
 
+### Phase 2 (Planned)
+- In-app notifications system
+- Teacher comments/notes on student performance
+- Assignment and quiz tracking
+- Goal setting with progress monitoring
+
+### Phase 3 (Future)
+- Parent portal with read-only access
 - Email notifications for low performance
-- Attendance tracking integration
+- Advanced ML-based predictions
 - Mobile application
-- Advanced analytics with ML predictions
-- Export reports to PDF
-- Parent portal access
+- Multi-language support
 
 ## Support
 
