@@ -416,7 +416,7 @@ function predictSGPA() {
         return;
     }
     
-    // Get marks for completed semesters only
+    // Get all marks
     const marks = JSON.parse(localStorage.getItem('marks')).filter(m => m.studentId === currentUser.id);
     
     if (marks.length === 0) {
@@ -424,24 +424,24 @@ function predictSGPA() {
         return;
     }
     
-    // Find highest semester with marks
-    const completedSemesters = [...new Set(marks.map(m => m.semester))].sort((a, b) => b - a);
-    const highestCompletedSem = completedSemesters[0];
-    
-    // Validate current semester
-    if (currentSem <= highestCompletedSem) {
-        alert(`Invalid! You have already completed semester ${highestCompletedSem}. Current semester must be ${highestCompletedSem + 1} or higher.`);
+    // Check if marks exist for current semester
+    const currentSemMarks = marks.filter(m => m.semester === currentSem);
+    if (currentSemMarks.length > 0) {
+        alert(`Error! You have already entered marks for semester ${currentSem}. Current semester should be a future semester where you haven't entered marks yet.`);
         return;
     }
     
-    if (currentSem > 8) {
-        alert('Current semester cannot exceed 8');
+    // Get marks only from completed semesters (before current semester)
+    const completedMarks = marks.filter(m => m.semester < currentSem);
+    
+    if (completedMarks.length === 0) {
+        alert(`No completed semesters found before semester ${currentSem}. Please enter a valid current semester.`);
         return;
     }
     
-    // Calculate current CGPA from completed semesters
+    // Calculate current CGPA from completed semesters only
     let totalCredits = 0, totalGradePoints = 0;
-    marks.forEach(m => {
+    completedMarks.forEach(m => {
         const gp = { O: 10, 'A+': 9, A: 8, 'B+': 7, B: 6, F: 0 }[m.grade] || 0;
         totalCredits += m.credits;
         totalGradePoints += gp * m.credits;
