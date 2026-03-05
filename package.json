@@ -1,0 +1,15 @@
+{
+  "name": "student-success-system",
+  "version": "2.0.0",
+  "description": "Student Success Prediction System",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
