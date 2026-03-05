@@ -424,24 +424,26 @@ function predictSGPA() {
         return;
     }
     
-    // Check if marks exist for current semester
-    const currentSemMarks = marks.filter(m => m.semester === currentSem);
-    if (currentSemMarks.length > 0) {
-        alert(`Error! You have already entered marks for semester ${currentSem}. Current semester should be a future semester where you haven't entered marks yet.`);
+    // Find highest completed semester
+    const completedSemesters = [...new Set(marks.map(m => m.semester))].sort((a, b) => b - a);
+    const highestCompletedSem = completedSemesters[0];
+    const expectedCurrentSem = highestCompletedSem + 1;
+    
+    // Current semester must be exactly one more than highest completed
+    if (currentSem !== expectedCurrentSem) {
+        alert(`Error! You have completed semester ${highestCompletedSem}. Current semester must be ${expectedCurrentSem}.`);
         return;
     }
     
-    // Get marks only from completed semesters (before current semester)
-    const completedMarks = marks.filter(m => m.semester < currentSem);
-    
-    if (completedMarks.length === 0) {
-        alert(`No completed semesters found before semester ${currentSem}. Please enter a valid current semester.`);
+    // Check if already at semester 8
+    if (highestCompletedSem === 8) {
+        alert('You have already completed all 8 semesters!');
         return;
     }
     
-    // Calculate current CGPA from completed semesters only
+    // Calculate current CGPA from completed semesters
     let totalCredits = 0, totalGradePoints = 0;
-    completedMarks.forEach(m => {
+    marks.forEach(m => {
         const gp = { O: 10, 'A+': 9, A: 8, 'B+': 7, B: 6, F: 0 }[m.grade] || 0;
         totalCredits += m.credits;
         totalGradePoints += gp * m.credits;
