@@ -25,6 +25,9 @@ function initializeData() {
     if (!localStorage.getItem('attendance')) {
         localStorage.setItem('attendance', JSON.stringify([]));
     }
+    if (!localStorage.getItem('trackedStudents')) {
+        localStorage.setItem('trackedStudents', JSON.stringify([]));
+    }
     if (!localStorage.getItem('darkMode')) {
         localStorage.setItem('darkMode', 'false');
     }
@@ -101,6 +104,7 @@ function showSection(sectionId) {
     if (sectionId === 'viewPerformance') loadPerformanceData();
     else if (sectionId === 'analytics') loadAnalytics();
     else if (sectionId === 'attendance') loadAttendanceData();
+    else if (sectionId === 'riskMonitor') loadRiskMonitor();
     else if (sectionId === 'viewMarks') {
         document.getElementById('studentMarksTable').innerHTML = '';
         document.getElementById('viewStudentSelect').value = '';
@@ -115,7 +119,9 @@ function showStudentSection(sectionId) {
     
     if (sectionId === 'myProgress') loadStudentProgress();
     else if (sectionId === 'cgpaPredictor') loadCurrentCGPA();
-    else if (sectionId === 'myMarks') loadStudentData();
+    else if (sectionId === 'myMarks') {
+        loadStudentData();
+    }
 }
 
 // Teacher functions
@@ -188,6 +194,30 @@ function updateTotal() {
     const internal = parseFloat(document.getElementById('internalMarks').value) || 0;
     const practical = parseFloat(document.getElementById('practicalMarks').value) || 0;
     const external = parseFloat(document.getElementById('externalMarks').value) || 0;
+    
+    // Validate marks
+    let isValid = true;
+    if (internal > 30) {
+        document.getElementById('internalMarks').style.borderColor = '#EF4444';
+        isValid = false;
+    } else {
+        document.getElementById('internalMarks').style.borderColor = '';
+    }
+    
+    if (practical > 20) {
+        document.getElementById('practicalMarks').style.borderColor = '#EF4444';
+        isValid = false;
+    } else {
+        document.getElementById('practicalMarks').style.borderColor = '';
+    }
+    
+    if (external > 50) {
+        document.getElementById('externalMarks').style.borderColor = '#EF4444';
+        isValid = false;
+    } else {
+        document.getElementById('externalMarks').style.borderColor = '';
+    }
+    
     const total = internal + practical + external;
     
     document.getElementById('totalMarks').textContent = total.toFixed(2);
@@ -201,6 +231,26 @@ document.getElementById('marksForm').addEventListener('submit', (e) => {
     const internal = parseFloat(document.getElementById('internalMarks').value);
     const practical = parseFloat(document.getElementById('practicalMarks').value);
     const external = parseFloat(document.getElementById('externalMarks').value);
+    
+    // Validate marks before submission
+    if (internal > 30) {
+        alert('❌ Error: Internal marks cannot exceed 30!');
+        document.getElementById('internalMarks').focus();
+        return;
+    }
+    
+    if (practical > 20) {
+        alert('❌ Error: Practical marks cannot exceed 20!');
+        document.getElementById('practicalMarks').focus();
+        return;
+    }
+    
+    if (external > 50) {
+        alert('❌ Error: External marks cannot exceed 50!');
+        document.getElementById('externalMarks').focus();
+        return;
+    }
+    
     const total = internal + practical + external;
     
     const mark = {
@@ -217,7 +267,7 @@ document.getElementById('marksForm').addEventListener('submit', (e) => {
     marks.push(mark);
     localStorage.setItem('marks', JSON.stringify(marks));
     
-    alert('Marks submitted successfully!');
+    alert('✅ Marks submitted successfully!');
     document.getElementById('marksForm').reset();
     updateTotal();
 });
@@ -344,6 +394,9 @@ function loadAnalytics() {
 
 // Student functions
 function loadStudentData() {
+    // Check for teacher instructions
+    loadTeacherInstructions();
+    
     const marks = JSON.parse(localStorage.getItem('marks')).filter(m => m.studentId === currentUser.id);
     
     if (marks.length === 0) {
@@ -382,6 +435,52 @@ function loadStudentData() {
     loadCurrentCGPA();
 }
 
+function loadTeacherInstructions() {
+    const trackedStudents = JSON.parse(localStorage.getItem('trackedStudents'));
+    const container = document.getElementById('teacherInstructions');
+    
+    // Find if current student is being tracked
+    const tracked = trackedStudents.find(t => t.roll === currentUser.roll);
+    
+    if (tracked && tracked.status === 'Active') {
+        const levelIcon = tracked.level === 'critical' ? '🔴' : '🟠';
+        const levelText = tracked.level === 'critical' ? 'Critical Risk' : 'High Risk';
+        const levelClass = tracked.level === 'critical' ? 'instruction-critical' : 'instruction-high';
+        
+        container.innerHTML = `
+            <div class="${levelClass}">
+                <div class="instruction-header">
+                    <div class="instruction-title">
+                        ${levelIcon} <strong>Teacher's Intervention Plan</strong>
+                        <span class="instruction-badge">${levelText}</span>
+                    </div>
+                    <span class="instruction-date">📅 ${new Date(tracked.dateAdded).toLocaleDateString()}</span>
+                </div>
+                <div class="instruction-stats">
+                    <div class="instruction-stat">
+                        <span class="label">🎯 Your CGPA:</span>
+                        <span class="value">${tracked.cgpa}</span>
+                    </div>
+                    <div class="instruction-stat">
+                        <span class="label">📅 Your Attendance:</span>
+                        <span class="value">${tracked.attendance}%</span>
+                    </div>
+                </div>
+                <div class="instruction-message">
+                    <h4>📝 Instructions from Your Teacher:</h4>
+                    <p>${tracked.instructions}</p>
+                </div>
+                <div class="instruction-footer">
+                    <p>💡 <strong>Note:</strong> Your teacher is monitoring your progress. Please follow the instructions above to improve your performance.</p>
+                </div>
+            </div>
+        `;
+        container.style.display = 'block';
+    } else {
+        container.style.display = 'none';
+    }
+}
+
 function loadCurrentCGPA() {
     const marks = JSON.parse(localStorage.getItem('marks')).filter(m => m.studentId === currentUser.id);
     
@@ -407,12 +506,12 @@ function predictSGPA() {
     
     // Validation
     if (currentSem < 1 || currentSem > 8) {
-        alert('Current semester must be between 1 and 8');
+        alert('❌ Current semester must be between 1 and 8');
         return;
     }
     
     if (targetCGPA < 0 || targetCGPA > 10) {
-        alert('Target CGPA must be between 0 and 10');
+        alert('❌ Target CGPA must be between 0 and 10');
         return;
     }
     
@@ -420,17 +519,18 @@ function predictSGPA() {
     const marks = JSON.parse(localStorage.getItem('marks')).filter(m => m.studentId === currentUser.id);
     
     if (marks.length === 0) {
-        alert('No marks found. Please complete at least one semester first.');
+        alert('❌ No marks found. Please wait for your teacher to enter marks first.');
         return;
     }
     
-    // Find the LOWEST semester with marks (this is the current semester)
+    // Get all unique semesters from marks
     const semestersWithMarks = [...new Set(marks.map(m => m.semester))].sort((a, b) => a - b);
-    const lowestSemWithMarks = semestersWithMarks[0];
+    const highestSemWithMarks = semestersWithMarks[semestersWithMarks.length - 1];
     
-    // Current semester must match the lowest semester with marks
-    if (currentSem !== lowestSemWithMarks) {
-        alert(`Error! You have marks entered for semester ${lowestSemWithMarks}. Current semester must be ${lowestSemWithMarks}.`);
+    // Current semester must match the highest semester with marks entered by teacher
+    if (currentSem !== highestSemWithMarks) {
+        alert(`❌ Error: Your teacher has entered marks up to Semester ${highestSemWithMarks}.\n\nYou must enter ${highestSemWithMarks} as your current semester, not ${currentSem}.\n\nPlease match the semester number with your actual marks data.`);
+        document.getElementById('currentSem').value = highestSemWithMarks;
         return;
     }
     
@@ -450,17 +550,14 @@ function predictSGPA() {
             <div class="prediction-card"><h4>Current CGPA</h4><div class="value">${currentCGPA.toFixed(2)}</div></div>
             <div class="prediction-card"><h4>Target CGPA</h4><div class="value">${targetCGPA.toFixed(2)}</div></div>
             <div class="prediction-card"><h4>Status</h4><div class="value achievable">✓ Already Achieved!</div></div>
-            <p style="color: #10b981; margin-top: 15px; text-align: center; font-weight: 600;">Congratulations! Your current CGPA (${currentCGPA.toFixed(2)}) is already ${currentCGPA > targetCGPA ? 'higher than' : 'equal to'} your target CGPA (${targetCGPA.toFixed(2)}).</p>
+            <p style="color: #10b981; margin-top: 15px; text-align: center; font-weight: 600;">🎉 Congratulations! Your current CGPA (${currentCGPA.toFixed(2)}) is already ${currentCGPA > targetCGPA ? 'higher than' : 'equal to'} your target CGPA (${targetCGPA.toFixed(2)}).</p>
         `;
         return;
     }
     
-    // Find highest semester with marks
-    const highestSemWithMarks = semestersWithMarks[semestersWithMarks.length - 1];
-    
     // Check if all semesters completed
     if (highestSemWithMarks === 8) {
-        alert('You have already completed all 8 semesters!');
+        alert('❌ You have already completed all 8 semesters!');
         return;
     }
     
@@ -473,12 +570,13 @@ function predictSGPA() {
     const achievable = requiredSGPA <= 10 && requiredSGPA >= 0;
     
     document.getElementById('predictionResult').innerHTML = `
+        <div class="prediction-card"><h4>Current Semester</h4><div class="value">${currentSem}</div></div>
         <div class="prediction-card"><h4>Current CGPA</h4><div class="value">${currentCGPA.toFixed(2)}</div></div>
         <div class="prediction-card"><h4>Target CGPA</h4><div class="value">${targetCGPA.toFixed(2)}</div></div>
         <div class="prediction-card"><h4>Required SGPA</h4><div class="value">${requiredSGPA.toFixed(2)}</div></div>
         <div class="prediction-card"><h4>Remaining Semesters</h4><div class="value">${remainingSemesters}</div></div>
         <div class="prediction-card"><h4>Status</h4><div class="value ${achievable ? 'achievable' : 'not-achievable'}">${achievable ? '✓ Achievable' : '✗ Not Achievable'}</div></div>
-        ${!achievable ? '<p style="color: #ef4444; margin-top: 15px; text-align: center; font-weight: 600;">Required SGPA exceeds 10.0. Please lower your target CGPA.</p>' : '<p style="color: #10b981; margin-top: 15px; text-align: center; font-weight: 600;">You need to score an average SGPA of ' + requiredSGPA.toFixed(2) + ' in remaining semesters!</p>'}
+        ${!achievable ? '<p style="color: #ef4444; margin-top: 15px; text-align: center; font-weight: 600;">⚠️ Required SGPA exceeds 10.0. Please lower your target CGPA.</p>' : '<p style="color: #10b981; margin-top: 15px; text-align: center; font-weight: 600;">💪 You need to score an average SGPA of ' + requiredSGPA.toFixed(2) + ' in remaining ' + remainingSemesters + ' semesters!</p>'}
     `;
 }
 
@@ -616,6 +714,240 @@ function loadAttendanceRecords() {
         html += '</tbody></table>';
         
         document.getElementById('attendanceTable').innerHTML = html;
+    }
+}
+
+// Risk Monitor System
+function loadRiskMonitor() {
+    const users = JSON.parse(localStorage.getItem('users'));
+    const marks = JSON.parse(localStorage.getItem('marks'));
+    const attendance = JSON.parse(localStorage.getItem('attendance'));
+    const students = Object.values(users).filter(u => u.type === 'student');
+    
+    const riskData = { critical: [], high: [], moderate: [], low: [] };
+    const alerts = [];
+    
+    students.forEach(s => {
+        const studentMarks = marks.filter(m => m.studentId === s.id);
+        const studentAtt = attendance.filter(a => a.studentId === s.id);
+        
+        let cgpa = 0;
+        let attPercentage = 0;
+        
+        // Calculate CGPA
+        if (studentMarks.length > 0) {
+            let totalCredits = 0, totalGradePoints = 0;
+            studentMarks.forEach(m => {
+                const gp = { O: 10, 'A+': 9, A: 8, 'B+': 7, B: 6, F: 0 }[m.grade] || 0;
+                totalCredits += m.credits;
+                totalGradePoints += gp * m.credits;
+            });
+            cgpa = totalCredits > 0 ? totalGradePoints / totalCredits : 0;
+        }
+        
+        // Calculate Attendance
+        if (studentAtt.length > 0) {
+            const present = studentAtt.filter(a => a.status === 'Present').length;
+            const late = studentAtt.filter(a => a.status === 'Late').length;
+            attPercentage = ((present + late * 0.5) / studentAtt.length * 100);
+        }
+        
+        const student = {
+            id: s.id,
+            name: s.name,
+            roll: s.roll,
+            cgpa: cgpa.toFixed(2),
+            attendance: attPercentage.toFixed(1),
+            issues: []
+        };
+        
+        // Identify issues
+        if (cgpa < 5.0 && studentMarks.length > 0) student.issues.push('Failing CGPA');
+        if (attPercentage < 50 && studentAtt.length > 0) student.issues.push('Critical Attendance');
+        if (cgpa >= 5.0 && cgpa < 6.5 && studentMarks.length > 0) student.issues.push('Low CGPA');
+        if (attPercentage >= 50 && attPercentage < 65 && studentAtt.length > 0) student.issues.push('Low Attendance');
+        if (attPercentage >= 65 && attPercentage < 75 && studentAtt.length > 0) student.issues.push('Below Average Attendance');
+        
+        // Categorize risk
+        if ((cgpa < 5.0 && studentMarks.length > 0) || (attPercentage < 50 && studentAtt.length > 0)) {
+            riskData.critical.push(student);
+            alerts.push({ student, level: 'critical', message: `${student.name} needs immediate intervention!` });
+        } else if ((cgpa >= 5.0 && cgpa < 6.5 && studentMarks.length > 0) || (attPercentage >= 50 && attPercentage < 65 && studentAtt.length > 0)) {
+            riskData.high.push(student);
+            alerts.push({ student, level: 'high', message: `${student.name} requires close monitoring` });
+        } else if ((cgpa >= 6.5 && cgpa < 7.5 && studentMarks.length > 0) || (attPercentage >= 65 && attPercentage < 75 && studentAtt.length > 0)) {
+            riskData.moderate.push(student);
+        } else if (studentMarks.length > 0 || studentAtt.length > 0) {
+            riskData.low.push(student);
+        }
+    });
+    
+    // Display alerts
+    if (alerts.length === 0) {
+        document.getElementById('riskAlerts').innerHTML = '<div class="alert-success"><strong>✅ All Clear!</strong> No students currently at critical or high risk.</div>';
+    } else {
+        let alertsHtml = '';
+        alerts.forEach(alert => {
+            const icon = alert.level === 'critical' ? '🚨' : '⚠️';
+            const className = alert.level === 'critical' ? 'alert-critical' : 'alert-high';
+            alertsHtml += `<div class="${className}">
+                <div class="alert-header">${icon} <strong>${alert.message}</strong></div>
+                <div class="alert-details">
+                    <span>🎯 CGPA: ${alert.student.cgpa}</span>
+                    <span>📅 Attendance: ${alert.student.attendance}%</span>
+                    <span>📝 Issues: ${alert.student.issues.join(', ')}</span>
+                </div>
+                <button onclick="trackStudent('${alert.student.roll}', '${alert.student.name}', ${alert.student.cgpa}, ${alert.student.attendance}, '${alert.level}')" class="btn-track">📊 Track & Add Instructions</button>
+            </div>`;
+        });
+        document.getElementById('riskAlerts').innerHTML = alertsHtml;
+    }
+    
+    // Display risk categories
+    displayRiskCategory('criticalRisk', riskData.critical);
+    displayRiskCategory('highRisk', riskData.high);
+    displayRiskCategory('moderateRisk', riskData.moderate);
+    displayRiskCategory('lowRisk', riskData.low);
+    
+    // Load tracked students
+    loadTrackedStudents();
+}
+
+function displayRiskCategory(elementId, students) {
+    const element = document.getElementById(elementId);
+    if (students.length === 0) {
+        element.innerHTML = '<p class="no-students">No students in this category</p>';
+    } else {
+        element.innerHTML = students.map(s => `
+            <div class="risk-student-card">
+                <div class="risk-student-header">
+                    <strong>${s.name}</strong>
+                    <span class="roll-badge">${s.roll}</span>
+                </div>
+                <div class="risk-student-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">CGPA</span>
+                        <span class="stat-value">${s.cgpa}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Attendance</span>
+                        <span class="stat-value">${s.attendance}%</span>
+                    </div>
+                </div>
+                ${s.issues.length > 0 ? `<div class="risk-issues">🚩 ${s.issues.join(', ')}</div>` : ''}
+            </div>
+        `).join('');
+    }
+}
+
+function trackStudent(roll, name, cgpa, attendance, level) {
+    const instructions = prompt(`📝 Enter intervention instructions for ${name} (${roll}):\n\nSuggested Actions:\n• Schedule one-on-one meeting\n• Review recent performance trends\n• Provide additional support resources\n• Set improvement goals\n• Monitor weekly progress\n\nEnter your custom instructions:`);
+    
+    if (instructions && instructions.trim()) {
+        const trackedStudents = JSON.parse(localStorage.getItem('trackedStudents'));
+        
+        // Check if already tracked
+        const existingIndex = trackedStudents.findIndex(t => t.roll === roll);
+        
+        const trackedData = {
+            roll,
+            name,
+            cgpa,
+            attendance,
+            level,
+            instructions: instructions.trim(),
+            dateAdded: new Date().toISOString(),
+            status: 'Active'
+        };
+        
+        if (existingIndex >= 0) {
+            trackedStudents[existingIndex] = trackedData;
+            alert('✅ Instructions updated successfully!');
+        } else {
+            trackedStudents.push(trackedData);
+            alert('✅ Student tracked successfully with instructions!');
+        }
+        
+        localStorage.setItem('trackedStudents', JSON.stringify(trackedStudents));
+        loadTrackedStudents();
+    }
+}
+
+function loadTrackedStudents() {
+    const trackedStudents = JSON.parse(localStorage.getItem('trackedStudents'));
+    const container = document.getElementById('trackedStudents');
+    
+    if (trackedStudents.length === 0) {
+        container.innerHTML = '<p class="no-tracked">No students currently being tracked. Click "Track & Add Instructions" on at-risk students to start monitoring.</p>';
+    } else {
+        container.innerHTML = trackedStudents.map((s, index) => {
+            const levelIcon = s.level === 'critical' ? '🔴' : '🟠';
+            const levelClass = s.level === 'critical' ? 'tracked-critical' : 'tracked-high';
+            return `
+                <div class="tracked-card ${levelClass}">
+                    <div class="tracked-header">
+                        <div>
+                            <h4>${levelIcon} ${s.name} <span class="tracked-roll">${s.roll}</span></h4>
+                            <span class="tracked-date">📅 Added: ${new Date(s.dateAdded).toLocaleDateString()}</span>
+                        </div>
+                        <span class="tracked-status">${s.status}</span>
+                    </div>
+                    <div class="tracked-stats">
+                        <div class="tracked-stat">
+                            <span class="label">🎯 CGPA:</span>
+                            <span class="value">${s.cgpa}</span>
+                        </div>
+                        <div class="tracked-stat">
+                            <span class="label">📅 Attendance:</span>
+                            <span class="value">${s.attendance}%</span>
+                        </div>
+                    </div>
+                    <div class="tracked-instructions">
+                        <h5>📝 Intervention Instructions:</h5>
+                        <p>${s.instructions}</p>
+                    </div>
+                    <div class="tracked-actions">
+                        <button onclick="editInstructions(${index})" class="btn-edit">✏️ Edit Instructions</button>
+                        <button onclick="markResolved(${index})" class="btn-resolve">✅ Mark Resolved</button>
+                        <button onclick="removeTracked(${index})" class="btn-remove">❌ Remove</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+}
+
+function editInstructions(index) {
+    const trackedStudents = JSON.parse(localStorage.getItem('trackedStudents'));
+    const student = trackedStudents[index];
+    
+    const newInstructions = prompt(`✏️ Edit instructions for ${student.name}:\n\nCurrent Instructions:\n${student.instructions}\n\nEnter new instructions:`, student.instructions);
+    
+    if (newInstructions && newInstructions.trim()) {
+        trackedStudents[index].instructions = newInstructions.trim();
+        localStorage.setItem('trackedStudents', JSON.stringify(trackedStudents));
+        alert('✅ Instructions updated!');
+        loadTrackedStudents();
+    }
+}
+
+function markResolved(index) {
+    if (confirm('✅ Mark this student as resolved? This will update their status.')) {
+        const trackedStudents = JSON.parse(localStorage.getItem('trackedStudents'));
+        trackedStudents[index].status = 'Resolved';
+        localStorage.setItem('trackedStudents', JSON.stringify(trackedStudents));
+        alert('✅ Student marked as resolved!');
+        loadTrackedStudents();
+    }
+}
+
+function removeTracked(index) {
+    if (confirm('❌ Remove this student from tracking?')) {
+        const trackedStudents = JSON.parse(localStorage.getItem('trackedStudents'));
+        trackedStudents.splice(index, 1);
+        localStorage.setItem('trackedStudents', JSON.stringify(trackedStudents));
+        alert('✅ Student removed from tracking!');
+        loadTrackedStudents();
     }
 }
 

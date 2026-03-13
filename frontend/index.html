@@ -14,15 +14,25 @@
     <!-- Login Page -->
     <div id="loginPage" class="page active">
         <div class="floating-emojis">
-            <span class="emoji" style="left: 10%; animation-delay: 0s;">📚</span>
-            <span class="emoji" style="left: 20%; animation-delay: 2s;">✏️</span>
-            <span class="emoji" style="left: 30%; animation-delay: 4s;">📝</span>
-            <span class="emoji" style="left: 40%; animation-delay: 1s;">🎯</span>
-            <span class="emoji" style="left: 50%; animation-delay: 3s;">💡</span>
-            <span class="emoji" style="left: 60%; animation-delay: 5s;">🏆</span>
-            <span class="emoji" style="left: 70%; animation-delay: 2.5s;">⭐</span>
-            <span class="emoji" style="left: 80%; animation-delay: 4.5s;">📊</span>
-            <span class="emoji" style="left: 90%; animation-delay: 1.5s;">🎓</span>
+            <span class="emoji" style="left: 5%; animation-delay: 0s;">📚</span>
+            <span class="emoji" style="left: 10%; animation-delay: 2s;">✏️</span>
+            <span class="emoji" style="left: 15%; animation-delay: 4s;">📝</span>
+            <span class="emoji" style="left: 20%; animation-delay: 1s;">🎯</span>
+            <span class="emoji" style="left: 25%; animation-delay: 3s;">💡</span>
+            <span class="emoji" style="left: 30%; animation-delay: 5s;">🏆</span>
+            <span class="emoji" style="left: 35%; animation-delay: 2.5s;">⭐</span>
+            <span class="emoji" style="left: 40%; animation-delay: 4.5s;">📊</span>
+            <span class="emoji" style="left: 45%; animation-delay: 1.5s;">🎓</span>
+            <span class="emoji" style="left: 50%; animation-delay: 3.5s;">📖</span>
+            <span class="emoji" style="left: 55%; animation-delay: 0.5s;">🖊️</span>
+            <span class="emoji" style="left: 60%; animation-delay: 2.8s;">🎒</span>
+            <span class="emoji" style="left: 65%; animation-delay: 4.2s;">💻</span>
+            <span class="emoji" style="left: 70%; animation-delay: 1.8s;">🔬</span>
+            <span class="emoji" style="left: 75%; animation-delay: 3.2s;">🧮</span>
+            <span class="emoji" style="left: 80%; animation-delay: 5.5s;">🌟</span>
+            <span class="emoji" style="left: 85%; animation-delay: 2.2s;">✨</span>
+            <span class="emoji" style="left: 90%; animation-delay: 4.8s;">🚀</span>
+            <span class="emoji" style="left: 95%; animation-delay: 1.2s;">🎉</span>
         </div>
         <div class="login-container">
             <div class="login-header">
@@ -78,6 +88,7 @@
                 <button class="section-tab" onclick="showSection('attendance')">Attendance</button>
                 <button class="section-tab" onclick="showSection('viewMarks')">View/Delete Marks</button>
                 <button class="section-tab" onclick="showSection('viewPerformance')">Student Performance</button>
+                <button class="section-tab" onclick="showSection('riskMonitor')">⚠️ Risk Monitor</button>
                 <button class="section-tab" onclick="showSection('analytics')">Analytics</button>
             </div>
             
@@ -222,6 +233,43 @@
                 </div>
             </div>
             
+            <!-- Risk Monitor Section -->
+            <div id="riskMonitor" class="section">
+                <div class="card">
+                    <h3>🚨 At-Risk Students Monitor</h3>
+                    <div id="riskAlerts" class="risk-alerts"></div>
+                </div>
+                <div class="card">
+                    <h3>📋 Tracked Students & Interventions</h3>
+                    <div id="trackedStudents" class="tracked-students"></div>
+                </div>
+                <div class="card">
+                    <h3>📊 Risk Categories</h3>
+                    <div class="risk-categories">
+                        <div class="risk-category critical">
+                            <h4>🔴 Critical Risk</h4>
+                            <p class="risk-desc">CGPA < 5.0 or Attendance < 50%</p>
+                            <div id="criticalRisk" class="risk-list"></div>
+                        </div>
+                        <div class="risk-category high">
+                            <h4>🟠 High Risk</h4>
+                            <p class="risk-desc">CGPA 5.0-6.4 or Attendance 50-65%</p>
+                            <div id="highRisk" class="risk-list"></div>
+                        </div>
+                        <div class="risk-category moderate">
+                            <h4>🟡 Moderate Risk</h4>
+                            <p class="risk-desc">CGPA 6.5-7.4 or Attendance 65-75%</p>
+                            <div id="moderateRisk" class="risk-list"></div>
+                        </div>
+                        <div class="risk-category low">
+                            <h4>🟢 Low Risk</h4>
+                            <p class="risk-desc">CGPA ≥ 7.5 and Attendance ≥ 75%</p>
+                            <div id="lowRisk" class="risk-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <!-- Analytics Section -->
             <div id="analytics" class="section">
                 <div class="card">
@@ -256,6 +304,7 @@
             
             <!-- My Marks Section -->
             <div id="myMarks" class="section active">
+                <div id="teacherInstructions" class="teacher-instructions-card"></div>
                 <div class="card">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                         <h3 style="margin: 0;">My Academic Performance</h3>

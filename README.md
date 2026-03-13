@@ -8,6 +8,12 @@ A comprehensive web-based system for tracking and predicting student academic pe
 - **Secure Login System**: Dedicated teacher authentication
 - **Marks Entry**: Enter internal, practical, and external marks for students
 - **Attendance Tracking**: Mark and monitor student attendance with statistics
+- **Risk Monitor System**: 🚨 Professional at-risk student tracking and intervention
+  - Real-time alerts for critical and high-risk students
+  - Automated risk categorization (Critical, High, Moderate, Low)
+  - Track students with failing CGPA or poor attendance
+  - Actionable intervention recommendations
+  - Visual risk indicators with emoji alerts
 - **Automatic Grading**: System automatically calculates total marks, grades, and pass/fail status
 - **Performance Analytics**: Visual graphs showing student performance trends with insights
 - **Student Segregation**: Automatically categorizes students based on CGPA:
@@ -22,6 +28,11 @@ A comprehensive web-based system for tracking and predicting student academic pe
 
 ### Student Portal
 - **Secure Login System**: Dedicated student authentication
+- **Teacher Instructions Alert**: 🚨 View intervention instructions from teachers if at-risk
+  - Prominent alert card showing teacher's personalized guidance
+  - Risk level indicator (Critical/High)
+  - Current CGPA and attendance display
+  - Date-stamped instructions for accountability
 - **View Marks**: Access internal, practical, and external marks for all semesters
 - **Attendance View**: Check attendance records and percentage
 - **CGPA Predictor**: Calculate required SGPA to achieve target CGPA
@@ -46,9 +57,10 @@ A comprehensive web-based system for tracking and predicting student academic pe
 
 ### Prerequisites
 - Modern web browser (Chrome, Firefox, Edge, Safari)
-- No backend or database required!
+- Node.js (for deployment only)
+- No database required!
 
-### Quick Start
+### Local Development
 
 1. Clone or download the repository
 2. Navigate to the frontend directory:
@@ -69,6 +81,32 @@ npx http-server -p 8000
 
 5. All data is stored in browser's LocalStorage - no database setup needed!
 
+### Production Deployment (Render)
+
+#### Quick Deploy (Windows)
+```bash
+deploy.bat
+```
+
+#### Quick Deploy (Mac/Linux)
+```bash
+chmod +x deploy.sh
+./deploy.sh
+```
+
+#### Manual Deploy
+1. Push code to GitHub
+2. Go to https://dashboard.render.com
+3. Create new Web Service
+4. Connect your GitHub repository
+5. Render auto-detects settings from `render.yaml`
+6. Click "Create Web Service"
+7. Wait 2-3 minutes for deployment
+
+**📖 Detailed deployment guide: See [DEPLOYMENT.md](DEPLOYMENT.md)**
+
+**🌐 Live Demo**: Your app will be at `https://YOUR-APP-NAME.onrender.com`
+
 ## Default Login Credentials
 
 ### Teacher Account
@@ -80,6 +118,24 @@ npx http-server -p 8000
 - Example: student1/student123, student2/student123, etc.
 
 ## Key Features Explained
+
+### 🚨 Risk Monitor System (Teacher)
+- **Automated Risk Detection**: System automatically identifies at-risk students
+- **Risk Categories**:
+  - 🔴 Critical Risk: CGPA < 5.0 or Attendance < 50%
+  - 🟠 High Risk: CGPA 5.0-6.4 or Attendance 50-65%
+  - 🟡 Moderate Risk: CGPA 6.5-7.4 or Attendance 65-75%
+  - 🟢 Low Risk: CGPA ≥ 7.5 and Attendance ≥ 75%
+- **Real-time Alerts**: Immediate notifications for students needing intervention
+- **Track & Add Instructions**: Teachers can add custom intervention instructions for at-risk students
+- **Tracked Students Dashboard**: Dedicated section showing all tracked students with:
+  - Custom intervention instructions
+  - Student performance metrics (CGPA, Attendance)
+  - Edit, Resolve, and Remove tracking options
+  - Date tracking and status management
+- **Visual Indicators**: Color-coded cards with emoji alerts for quick identification
+- **Detailed Insights**: View CGPA, attendance, and specific issues for each student
+- **Persistent Tracking**: All tracking data saved in localStorage for continuous monitoring
 
 ### 🌙 Dark Mode
 - Toggle between light and dark themes
